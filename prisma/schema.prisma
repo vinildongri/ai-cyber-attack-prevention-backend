@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EventStatus {
+  PENDING
+  RECOGNIZED
+  SECURING
+}
+
+model User {
+  id           String             @id @default(cuid())
+  name         String
+  email        String             @unique
+  passwordHash String
+  createdAt    DateTime           @default(now())
+  accounts     ConnectedAccount[]
+  devices      TrustedDevice[]
+  settings     UserSettings?
+}
+
+model ConnectedAccount {
+  id        String          @id @default(cuid())
+  userId    String
+  platform  String
+  username  String
+  createdAt DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events    SecurityEvent[]
+}
+
+model SecurityEvent {
+  id          String           @id @default(cuid())
+  accountId   String
+  eventType   String
+  severity    Severity
+  device      String?
+  status      EventStatus      @default(PENDING)
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+  account     ConnectedAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt])
+}
+
+model TrustedDevice {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  type      String   @default("other")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+}
+
+model UserSettings {
+  userId     String  @id
+  sleepMode  Boolean @default(false)
+  sleepStart String  @default("23:00")
+  sleepEnd   String  @default("07:00")
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
