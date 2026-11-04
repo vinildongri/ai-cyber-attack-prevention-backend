@@ -12,8 +12,10 @@ import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
-app.use(express.json());
 app.use(cors);
+app.use(express.json());
+
+app.get("/health", (req, res) => res.json({ ok: true }));
 
 app.use("/auth", authRoutes);
 app.use("/accounts", accountRoutes);
@@ -21,6 +23,7 @@ app.use("/events", eventRoutes);
 app.use("/devices", deviceRoutes);
 app.use("/settings", settingsRoutes);
 app.use("/chat", chatRoutes);
+
 
 app.use(errorHandler);
 
