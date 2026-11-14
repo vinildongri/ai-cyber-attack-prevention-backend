@@ -38,14 +38,16 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+// Routes
 app.get("/health", (req, res) => res.json({ ok: true }));
-app.use("/api/v1/auth", authRoutes);
-app.use("/accounts", accountRoutes);
-app.use("/events", eventRoutes);
-app.use("/devices", deviceRoutes);
-app.use("/settings", settingsRoutes);
-app.use("/chat", chatRoutes);
 
+// Add /api/v1 prefix to ALL routes so they match the frontend's API_BASE_URL
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/accounts", accountRoutes);
+app.use("/api/v1/events", eventRoutes);
+app.use("/api/v1/devices", deviceRoutes);
+app.use("/api/v1/settings", settingsRoutes);
+app.use("/api/v1/chat", chatRoutes);
 app.use(errorHandler);
 
 const server = createServer(app);
