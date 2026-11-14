@@ -12,25 +12,24 @@ import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
-}));
-app.use(express.json());
-// Routes must come AFTER cors
-app.use('/api/v1/auth', authRoutes);
+// 1. Fix Custom CORS: Pass the function reference directly without invoking it with ()
+app.use(cors);
+
+// 2. Parse JSON bodies (removed the duplicate entry you had below)
 app.use(express.json());
 
+// Health check
 app.get("/health", (req, res) => res.json({ ok: true }));
 
-app.use("/auth", authRoutes);
+// 3. Routes (Removed the duplicate "/auth" route so it doesn't conflict with "/api/v1/auth")
+app.use('/api/v1/auth', authRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/events", eventRoutes);
 app.use("/devices", deviceRoutes);
 app.use("/settings", settingsRoutes);
 app.use("/chat", chatRoutes);
 
-
+// Error Handler
 app.use(errorHandler);
 
 const server = createServer(app);
