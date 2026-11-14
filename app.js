@@ -12,7 +12,13 @@ import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
-app.use(cors);
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
+app.use(express.json());
+// Routes must come AFTER cors
+app.use('/api/v1/auth', authRoutes);
 app.use(express.json());
 
 app.get("/health", (req, res) => res.json({ ok: true }));
